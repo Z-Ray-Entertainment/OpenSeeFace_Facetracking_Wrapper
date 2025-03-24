@@ -3,6 +3,11 @@ import os
 import re
 import subprocess
 
+import gi
+
+gi.require_version("Xdp", "1.0")
+from gi.repository.Xdp import Portal
+
 
 class VideoMode:
     def __init__(self, width: int, height: int, fps: int):
@@ -48,6 +53,11 @@ class WebcamInfo:
 
     def print_info(self):
         print(self.debug_info())
+
+
+def get_webcams_pipewire(portal: Portal) -> [WebcamInfo]:
+    pipewire_remote = portal.open_pipewire_remote_for_camera()
+    return []
 
 
 def get_webcams() -> [WebcamInfo]:
