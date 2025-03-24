@@ -29,6 +29,25 @@
       ]
     },
     {
+      "name": "libportal",
+      "buildsystem": "meson",
+      "config-opts": [
+        "-Dbackend-gtk3=disabled",
+        "-Dbackend-gtk4=enabled",
+        "-Dbackend-qt5=disabled",
+        "-Ddocs=false",
+        "-Dtests=false",
+        "-Dvapi=false"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/flatpak/libportal.git",
+          "tag": "0.8.1"
+        }
+      ]
+    },
+    {
       "name": "facetracker",
       "builddir": true,
       "buildsystem": "meson",
