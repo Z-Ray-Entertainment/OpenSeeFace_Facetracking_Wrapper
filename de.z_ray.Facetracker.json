@@ -8,7 +8,6 @@
     "--share=network",
     "--share=ipc",
     "--socket=fallback-x11",
-    "--device=all",
     "--socket=wayland"
   ],
   "modules": [
