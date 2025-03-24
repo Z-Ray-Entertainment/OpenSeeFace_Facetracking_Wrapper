@@ -35,6 +35,7 @@
         "-Dbackend-gtk3=disabled",
         "-Dbackend-gtk4=enabled",
         "-Dbackend-qt5=disabled",
+        "-Dbackend-qt6=disabled",
         "-Ddocs=false",
         "-Dtests=false",
         "-Dvapi=false"
