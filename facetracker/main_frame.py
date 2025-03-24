@@ -1,4 +1,5 @@
 import gi
+from gi.repository.Gio import Task
 
 from facetracker import webcam_info, face_wrapper
 from facetracker.const import APP_NAME, VERSION
@@ -6,7 +7,12 @@ from facetracker.webcam_info import VideoMode
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Adw, Gio
+gi.require_version("Xdp", "1.0")
+from gi.repository.Xdp import CameraFlags
+from gi.repository import Gtk, Adw, Gio, Xdp
+
+camera_access_granted = False
+portal = Xdp.Portal.new()
 
 
 class MainWindow(Gtk.ApplicationWindow):
@@ -54,11 +60,8 @@ class MainWindow(Gtk.ApplicationWindow):
         self.main_box.set_margin_start(10)
         self.main_box.set_margin_top(10)
         self.main_box.set_margin_bottom(10)
-
-        if len(self.webcam_infos) > 0:
-            self._build_cam_found()
-        else:
-            self._build_no_cams_found()
+        # self._build_cam_found()
+        self._build_no_cams_found()
         self.set_child(self.main_box)
 
     def _build_cam_found(self):
@@ -159,8 +162,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.video_modes_row.set_model(mode_string_list)
 
     def _rescan_for_cams(self, widget):
-        self.webcam_infos = webcam_info.get_webcams()
-        if len(self.webcam_infos) > 0:
+        if portal.is_camera_present() and camera_access_granted:
             self._reset_main_box()
             self._build_main_content()
 
@@ -207,13 +209,23 @@ class MainWindow(Gtk.ApplicationWindow):
                 return cam
 
 
+def _exit_on_error_dialog(data_1, data_2):
+    exit(0)
+
+
+def on_close(result):
+    if face_wrapper.tracking_in_progress():
+        face_wrapper.stop_facetracker()
+
+
 class OpenSeeFaceFacetrackingWrapper(Adw.Application):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.create_action("about", self.build_about)
         self.connect("activate", self.on_activate)
-        self.connect("shutdown", self.on_close)
+        self.connect("shutdown", on_close)
         self.win = None
+        self.app = None
 
     def create_action(self, name, callback):
         action = Gio.SimpleAction.new(name, None)
@@ -221,12 +233,35 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
         self.add_action(action)
 
     def on_activate(self, app):
-        self.win = MainWindow(application=app)
-        self.win.present()
+        self.app = app
+        self.win = MainWindow(application=self.app)
+        if portal.is_camera_present():
+            portal.access_camera(parent=None, flags=CameraFlags.NONE, cancellable=None,
+                                 callback=self._access_camera_callback)
 
-    def on_close(self, result):
-        if face_wrapper.tracking_in_progress():
-            face_wrapper.stop_facetracker()
+    def _access_camera_callback(self, xdp_portal, async_result: Task):
+        try:
+            access_granted = xdp_portal.access_camera_finish(async_result)
+            self.win.present()
+        except gi.repository.GLib.GError as exception:
+            exception_dialog = Adw.AlertDialog(heading=_("Camera access failed"))
+
+            match exception.code:
+                case 36:
+                    exception_dialog.set_body(
+                        _("Camera access is disable on this system. Please check privacy settings"))
+                case 19:
+                    # Works from distrobox but not from Gnome Builder or if the app is installed normaly as a flatpak
+                    # WHY!?
+                    print(exception)
+                    exit(0)
+                case _:
+                    exception_dialog.set_body(
+                        _("Access failed with error: " + exception.message + " (" + str(exception.code) + ")"))
+            exception_dialog.add_response("ok", _("Ok"))
+            exception_dialog.set_response_appearance("ok", Adw.ResponseAppearance.DESTRUCTIVE)
+            exception_dialog.connect("response", _exit_on_error_dialog)
+            exception_dialog.present(self.win)
 
     def build_about(self, widget, _a):
         about_ui = Adw.AboutDialog(
