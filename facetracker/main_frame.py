@@ -34,7 +34,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self._build_main_content()
 
     def rescan_for_cams(self, widget):
-        global camera_access_granted
         if portal.is_camera_present() and camera_access_granted:
             self._reset_main_box()
             self._build_main_content()
@@ -66,7 +65,6 @@ class MainWindow(Gtk.ApplicationWindow):
         self.main_box.set_margin_start(10)
         self.main_box.set_margin_top(10)
         self.main_box.set_margin_bottom(10)
-        global camera_access_granted
         if camera_access_granted:
             self._build_cam_found()
         else:
