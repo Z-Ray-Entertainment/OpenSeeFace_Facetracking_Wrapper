@@ -59,6 +59,7 @@
             <description>
                 <ul>
                     <li>Gnome SDK 48</li>
+                    <li>Use camera portal to access video devices</li>
                 </ul>
             </description>
         </release>
