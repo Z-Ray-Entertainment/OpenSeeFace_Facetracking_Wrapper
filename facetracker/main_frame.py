@@ -26,7 +26,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.advanced_row: Adw.ExpanderRow
         self.ip_text: Adw.EntryRow
         self.port_text: Adw.EntryRow
-        self.webcam_infos = webcam_info.get_webcams()
+        self.webcam_infos = None
 
         self._reset_main_box()
         self.set_title(APP_NAME)
@@ -72,6 +72,7 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_child(self.main_box)
 
     def _build_cam_found(self):
+        self.webcam_infos = webcam_info.get_webcams()
         boxed_list = Gtk.ListBox()
         boxed_list.set_selection_mode(Gtk.SelectionMode.NONE)
         boxed_list.add_css_class("boxed-list")
