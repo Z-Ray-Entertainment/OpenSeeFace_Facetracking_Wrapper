@@ -35,8 +35,7 @@ configure_file(
 facetracker_sources = files([
     'face_wrapper.py',
     'main_frame.py',
-    'webcam_info.py',
-    'portal.py'
+    'webcam_info.py'
 ])
 
 install_data(facetracker_sources, install_dir: moduledir)

@@ -50,6 +50,7 @@ Simple wrapper UI for OpenSeeFace's facetracker.
 - Install
   - typelib-1_0-Gtk-4_0
   - typelib-1_0-Adw-1
+  - typelib-1_0-XdpGtk4-1_0
 - Provide osf pre-build binary (see below)
 - `python3 facetracker/__init__.py`
 
