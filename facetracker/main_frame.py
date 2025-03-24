@@ -33,6 +33,12 @@ class MainWindow(Gtk.ApplicationWindow):
         self._build_title_bar()
         self._build_main_content()
 
+    def rescan_for_cams(self, widget):
+        global camera_access_granted
+        if portal.is_camera_present() and camera_access_granted:
+            self._reset_main_box()
+            self._build_main_content()
+
     def _reset_main_box(self):
         self.main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
 
@@ -60,8 +66,11 @@ class MainWindow(Gtk.ApplicationWindow):
         self.main_box.set_margin_start(10)
         self.main_box.set_margin_top(10)
         self.main_box.set_margin_bottom(10)
-        # self._build_cam_found()
-        self._build_no_cams_found()
+        global camera_access_granted
+        if camera_access_granted:
+            self._build_cam_found()
+        else:
+            self._build_no_cams_found()
         self.set_child(self.main_box)
 
     def _build_cam_found(self):
@@ -96,7 +105,7 @@ class MainWindow(Gtk.ApplicationWindow):
 
         bt_refresh = Gtk.Button.new_from_icon_name("view-refresh-symbolic")
         bt_refresh.set_tooltip_text(_("Rescan for webcams"))
-        bt_refresh.connect("clicked", self._rescan_for_cams)
+        bt_refresh.connect("clicked", self.rescan_for_cams)
         bt_refresh.add_css_class("suggested-action")
         no_cams_found_status.set_child(bt_refresh)
 
@@ -160,11 +169,6 @@ class MainWindow(Gtk.ApplicationWindow):
         for mode in selected_cam.get_osf_video_modes():
             mode_string_list.append(mode.to_string())
         self.video_modes_row.set_model(mode_string_list)
-
-    def _rescan_for_cams(self, widget):
-        if portal.is_camera_present() and camera_access_granted:
-            self._reset_main_box()
-            self._build_main_content()
 
     def _get_selected_camera_index(self) -> int:
         selected_item = self.cam_combo_row.get_selected_item()
@@ -242,6 +246,10 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
     def _access_camera_callback(self, xdp_portal, async_result: Task):
         try:
             access_granted = xdp_portal.access_camera_finish(async_result)
+            if access_granted:
+                global camera_access_granted
+                camera_access_granted = True
+                self.win.rescan_for_cams(None)
             self.win.present()
         except gi.repository.GLib.GError as exception:
             exception_dialog = Adw.AlertDialog(heading=_("Camera access failed"))
@@ -249,15 +257,15 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
             match exception.code:
                 case 36:
                     exception_dialog.set_body(
-                        _("Camera access is disable on this system. Please check privacy settings"))
+                        _("Camera access is globally disable on this device. Please check your privacy settings"))
                 case 19:
-                    # Works from distrobox but not from Gnome Builder or if the app is installed normaly as a flatpak
-                    # WHY!?
-                    print(exception)
-                    exit(0)
+                    exception_dialog.set_body(
+                        _("Facetracker is not allowed to access video devices on this system. "
+                          "Please check the application permissions."))
                 case _:
                     exception_dialog.set_body(
-                        _("Access failed with error: " + exception.message + " (" + str(exception.code) + ")"))
+                        _("Could not access any video device. Failed with error: "
+                          + exception.message + " (" + str(exception.code) + ")"))
             exception_dialog.add_response("ok", _("Ok"))
             exception_dialog.set_response_appearance("ok", Adw.ResponseAppearance.DESTRUCTIVE)
             exception_dialog.connect("response", _exit_on_error_dialog)
