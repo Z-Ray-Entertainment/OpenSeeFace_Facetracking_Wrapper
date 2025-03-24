@@ -14,10 +14,5 @@ import gettext
 
 gettext.install('facetracker', LOCALE_DIR)
 
-
-def run():
-    OpenSeeFaceFacetrackingWrapper(application_id=APP_ID).run(sys.argv)
-
-
 if __name__ == '__main__':
     OpenSeeFaceFacetrackingWrapper(application_id=APP_ID).run(sys.argv)
