@@ -238,7 +238,13 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
     def on_activate(self, app):
         self.app = app
         self.win = MainWindow(application=self.app)
+        self.win.present()
         if portal.is_camera_present():
+            # Why is this shit not documented ...
+            # how on earth do I get the Xdp.Parent of a Gtk.ApplicationWindow if it isn't the Window itself!?
+            # From the docs:
+            # "XdpParent implementations for GTK 3, GTK 4, Qt 5, and Qt 6 are available as separate libraries."
+            # ... and where is it?
             portal.access_camera(parent=None, flags=CameraFlags.NONE, cancellable=None,
                                  callback=self._access_camera_callback)
 
@@ -249,7 +255,6 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
                 global camera_access_granted
                 camera_access_granted = True
                 self.win.rescan_for_cams(None)
-            self.win.present()
         except gi.repository.GLib.GError as exception:
             exception_dialog = Adw.AlertDialog(heading=_("Camera access failed"))
 
