@@ -282,16 +282,16 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
             developer_name="Z-Ray Entertainment",
             version=VERSION,
             developers=[
-                "Vortex Acherontic https://github.com/VortexAcherontic",
+                "Vortex Acherontic https://codeberg.org/vortex_acherontic",
             ],
             artists=[
-                "Vortex Acherontic https://github.com/VortexAcherontic",
+                "Vortex Acherontic https://codeberg.org/vortex_acherontic",
             ],
             debug_info=get_debug_info(),
             translator_credits=_("translator-credits"),
             license_type=Gtk.License.MIT_X11,
-            website="https://github.com/Z-Ray-Entertainment/Facetracker",
-            issue_url="https://github.com/Z-Ray-Entertainment/Facetracker/issues",
+            website="https://codeberg.org/ZRayEntertainment/Facetracker",
+            issue_url="https://codeberg.org/ZRayEntertainment/Facetracker/issues",
             comments=_("Facetracker is a a graphical user interface for OpenSeeFace. "
                        "OpenSeeFace is an independent piece of software and not associated with Facetracker. "
                        "OpenSeeFace is distributed under "

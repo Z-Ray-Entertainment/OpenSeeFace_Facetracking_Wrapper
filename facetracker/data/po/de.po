@@ -108,7 +108,7 @@ msgstr "Videomodus der Gesichtsverfolgung"
 
 #: facetracker/main_frame.py:243
 msgid "translator-credits"
-msgstr "Vortex Acherotnic https://github.com/VortexAcherontic"
+msgstr "Vortex Acherotnic https://codeberg.org/ZRayEntertainment/Facetracker"
 
 #: facetracker/main_frame.py:247
 msgid ""

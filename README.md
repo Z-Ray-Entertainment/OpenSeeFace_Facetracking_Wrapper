@@ -2,7 +2,7 @@
 
 <div style="text-align: center;">
 
-![logo](https://raw.githubusercontent.com/Z-Ray-Entertainment/Facetracker/main/facetracker/data/icons/hicolor/scalable/apps/de.z_ray.Facetracker.svg)
+![logo](https://codeberg.org/ZRayEntertainment/Facetracker/raw/tag/25.2.1/facetracker/data/icons/hicolor/scalable/apps/de.z_ray.Facetracker.svg)
 
 </div>
 
@@ -16,9 +16,9 @@ Simple wrapper UI for OpenSeeFace's facetracker.
 
 <div style="text-align: center;">
 
-![screenshot](https://raw.githubusercontent.com/Z-Ray-Entertainment/Facetracker/main/facetracker/data/screenshots/facetracker.png)
-![screenshot](https://raw.githubusercontent.com/Z-Ray-Entertainment/Facetracker/main/facetracker/data/screenshots/facetracker_2.png)
-![screenshot](https://raw.githubusercontent.com/Z-Ray-Entertainment/Facetracker/main/facetracker/data/screenshots/facetracker_3.png)
+![screenshot](https://codeberg.org/ZRayEntertainment/Facetracker/raw/tag/25.2.1/facetracker/data/screenshots/facetracker.png)
+![screenshot](https://codeberg.org/ZRayEntertainment/Facetracker/raw/tag/25.2.1/facetracker/data/screenshots/facetracker_2.png)
+![screenshot](https://codeberg.org/ZRayEntertainment/Facetracker/raw/tag/25.2.1/facetracker/data/screenshots/facetracker_3.png)
 
 </div>
 
