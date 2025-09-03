@@ -8,11 +8,13 @@ from facetracker.webcam_info import VideoMode
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 gi.require_version("Xdp", "1.0")
+gi.require_version("XdpGtk4", "1.0")
 from gi.repository.Xdp import CameraFlags
 from gi.repository import Gtk, Adw, Gio, Xdp
+from gi.repository import XdpGtk4
 
 camera_access_granted = False
-portal = Xdp.Portal.new()
+portal: Xdp.Portal = Xdp.Portal.new()
 
 
 class MainWindow(Gtk.ApplicationWindow):
@@ -210,6 +212,7 @@ class MainWindow(Gtk.ApplicationWindow):
         for cam in self.webcam_infos:
             if cam.device_index == index:
                 return cam
+        return None
 
 
 def _exit_on_error_dialog(data_1, data_2):
@@ -240,12 +243,8 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
         self.win = MainWindow(application=self.app)
         self.win.present()
         if portal.is_camera_present():
-            # Why is this shit not documented ...
-            # how on earth do I get the Xdp.Parent of a Gtk.ApplicationWindow if it isn't the Window itself!?
-            # From the docs:
-            # "XdpParent implementations for GTK 3, GTK 4, Qt 5, and Qt 6 are available as separate libraries."
-            # ... and where is it?
-            portal.access_camera(parent=None, flags=CameraFlags.NONE, cancellable=None,
+            parent = XdpGtk4.parent_new_gtk(self.win)
+            portal.access_camera(parent=parent, flags=CameraFlags.NONE, cancellable=None,
                                  callback=self._access_camera_callback)
 
     def _access_camera_callback(self, xdp_portal, async_result: Task):
