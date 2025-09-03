@@ -21,6 +21,8 @@ class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.connect("show", self.on_show)
+
         self.bt_launch: Gtk.ToggleButton
         self.cam_combo_row: Adw.ComboRow
         self.video_modes_row: Adw.ComboRow
@@ -34,6 +36,39 @@ class MainWindow(Gtk.ApplicationWindow):
         self.set_title(APP_NAME)
         self._build_title_bar()
         self._build_main_content()
+
+    def on_show(self, widget):
+        if portal.is_camera_present():
+            parent = XdpGtk4.parent_new_gtk(self)
+            portal.access_camera(parent=parent, flags=CameraFlags.NONE, cancellable=None,
+                                 callback=self._access_camera_callback)
+
+    def _access_camera_callback(self, xdp_portal, async_result: Task):
+        try:
+            access_granted = xdp_portal.access_camera_finish(async_result)
+            if access_granted:
+                global camera_access_granted
+                camera_access_granted = True
+                self.rescan_for_cams(None)
+        except gi.repository.GLib.GError as exception:
+            exception_dialog = Adw.AlertDialog(heading=_("Camera access failed"))
+
+            match exception.code:
+                case 36:
+                    exception_dialog.set_body(
+                        _("Camera access is globally disable on this device. Please check your privacy settings"))
+                case 19:
+                    exception_dialog.set_body(
+                        _("Facetracker is not allowed to access video devices on this system. "
+                          "Please check the application permissions."))
+                case _:
+                    exception_dialog.set_body(
+                        _("Could not access any video device. Failed with error: "
+                          + exception.message + " (" + str(exception.code) + ")"))
+            exception_dialog.add_response("ok", _("Ok"))
+            exception_dialog.set_response_appearance("ok", Adw.ResponseAppearance.DESTRUCTIVE)
+            exception_dialog.connect("response", _exit_on_error_dialog)
+            exception_dialog.present(self.win)
 
     def rescan_for_cams(self, widget):
         if portal.is_camera_present() and camera_access_granted:
@@ -242,37 +277,6 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
         self.app = app
         self.win = MainWindow(application=self.app)
         self.win.present()
-        if portal.is_camera_present():
-            parent = XdpGtk4.parent_new_gtk(self.win)
-            portal.access_camera(parent=parent, flags=CameraFlags.NONE, cancellable=None,
-                                 callback=self._access_camera_callback)
-
-    def _access_camera_callback(self, xdp_portal, async_result: Task):
-        try:
-            access_granted = xdp_portal.access_camera_finish(async_result)
-            if access_granted:
-                global camera_access_granted
-                camera_access_granted = True
-                self.win.rescan_for_cams(None)
-        except gi.repository.GLib.GError as exception:
-            exception_dialog = Adw.AlertDialog(heading=_("Camera access failed"))
-
-            match exception.code:
-                case 36:
-                    exception_dialog.set_body(
-                        _("Camera access is globally disable on this device. Please check your privacy settings"))
-                case 19:
-                    exception_dialog.set_body(
-                        _("Facetracker is not allowed to access video devices on this system. "
-                          "Please check the application permissions."))
-                case _:
-                    exception_dialog.set_body(
-                        _("Could not access any video device. Failed with error: "
-                          + exception.message + " (" + str(exception.code) + ")"))
-            exception_dialog.add_response("ok", _("Ok"))
-            exception_dialog.set_response_appearance("ok", Adw.ResponseAppearance.DESTRUCTIVE)
-            exception_dialog.connect("response", _exit_on_error_dialog)
-            exception_dialog.present(self.win)
 
     def build_about(self, widget, _a):
         about_ui = Adw.AboutDialog(
