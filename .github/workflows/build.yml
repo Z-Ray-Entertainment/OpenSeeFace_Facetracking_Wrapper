@@ -1,0 +1,397 @@
+name: Build Facetracker Packages
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '25.*'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deb:
+    name: "Debian Package (amd64)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Clone upstream source
+        run: |
+          git clone --depth 1 --branch 25.9 https://github.com/Z-Ray-Entertainment/Facetracker.git facetracker-src
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y devscripts debhelper-compat meson ninja-build python3 python3-gi python3-pil python3-numpy pkg-config libglib2.0-dev appstream libgtk-4-dev libadwaita-1-dev gobject-introspection v4l-utils desktop-file-utils gettext
+
+      - name: Build Debian package
+        run: |
+          cp -r debian facetracker-src/
+          cd facetracker-src
+          debuild -us -uc -b
+
+      - name: Upload Debian artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: facetracker-deb
+          path: facetracker_*.deb
+
+      - name: Generate release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "# Facetracker $TAG" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Face tracking made easy - graphical interface for OpenSeeFace." >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### AppImage (Universal)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "chmod +x facetracker-x86_64.AppImage" >> release_notes.md
+          echo "./facetracker-x86_64.AppImage" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Debian/Ubuntu" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo dpkg -i facetracker_*.deb" >> release_notes.md
+          echo "sudo apt-get install -f" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### RPM (Fedora/RHEL/openSUSE)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo rpm -i facetracker-*.rpm" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Pacman (Arch/Manjaro)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo pacman -U facetracker-*.pkg.tar.zst" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Required Dependencies (all formats)" >> release_notes.md
+          echo "- python3, python3-gi, python3-pil, python3-numpy" >> release_notes.md
+          echo "- GTK4, libadwaita" >> release_notes.md
+          echo "- v4l-utils (for webcam detection)" >> release_notes.md
+          echo "- OpenSeeFace facetracker binary (see [upstream](https://github.com/emilianavt/OpenSeeFace))" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "_Generated with AI assistance_" >> release_notes.md
+
+      - name: Release Debian package
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: facetracker_*.deb
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  appimage:
+    name: "AppImage (amd64)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Clone upstream source
+        run: |
+          git clone --depth 1 --branch 25.9 https://github.com/Z-Ray-Entertainment/Facetracker.git facetracker-src
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget fuse libfuse2 meson ninja-build python3 python3-gi python3-pil python3-numpy pkg-config libglib2.0-dev appstream libgtk-4-dev libadwaita-1-dev gobject-introspection v4l-utils desktop-file-utils gettext
+
+      - name: Build facetracker
+        run: |
+          cd facetracker-src
+          meson setup builddir --prefix=/usr
+          ninja -C builddir
+          DESTDIR=$(pwd)/../appdir ninja -C builddir install
+
+      - name: Patch facetracker-gui for AppImage path
+        run: |
+          sed -i 's|if environ.get("FLATPAK_ID") is not None:|if environ.get("APPDIR"):\n    pkgdatadir = environ.get("APPDIR") + pkgdatadir\nelif False:|' appdir/usr/bin/facetracker-gui
+
+      - name: Create AppDir structure
+        run: |
+          mkdir -p appdir/usr/share/applications appdir/usr/share/icons/hicolor/scalable/apps appdir/usr/share/metainfo appdir/usr/share/icons/hicolor/symbolic/apps
+          cp facetracker-src/de.z_ray.Facetracker.desktop appdir/de.z_ray.Facetracker.desktop
+          cp facetracker-src/facetracker/data/icons/hicolor/scalable/apps/de.z_ray.Facetracker.svg appdir/de.z_ray.Facetracker.svg
+          cp facetracker-src/de.z_ray.Facetracker.metainfo.xml appdir/usr/share/metainfo/
+          sed -i 's|Exec=.*|Exec=facetracker-gui|' appdir/de.z_ray.Facetracker.desktop
+          sed -i 's|Icon=.*|Icon=de.z_ray.Facetracker|' appdir/de.z_ray.Facetracker.desktop
+
+      - name: Create AppRun
+        run: |
+          cat > appdir/AppRun << 'EOF'
+          #!/bin/bash
+          set -e
+          HERE="$(dirname "$(readlink -f "$0")")"
+          export PATH="${HERE}/usr/bin:${PATH}"
+          export PYTHONPATH="${HERE}/usr/share/facetracker:${PYTHONPATH}"
+          export LD_LIBRARY_PATH="${HERE}/usr/lib:${HERE}/usr/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH}"
+          export XDG_DATA_DIRS="${HERE}/usr/share:${XDG_DATA_DIRS}"
+          export APPDIR="${HERE}"
+          exec "${HERE}/usr/bin/facetracker-gui" "$@"
+          EOF
+          chmod +x appdir/AppRun
+
+      - name: Download appimagetool
+        run: |
+          wget -q https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage -O appimagetool
+          chmod +x appimagetool
+
+      - name: Build AppImage
+        run: |
+          ARCH=x86_64 ./appimagetool --no-appstream appdir facetracker-x86_64.AppImage
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: facetracker-appimage
+          path: facetracker-x86_64.AppImage
+
+      - name: Generate release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "# Facetracker $TAG" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Face tracking made easy - graphical interface for OpenSeeFace." >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### AppImage (Universal)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "chmod +x facetracker-x86_64.AppImage" >> release_notes.md
+          echo "./facetracker-x86_64.AppImage" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Debian/Ubuntu" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo dpkg -i facetracker_*.deb" >> release_notes.md
+          echo "sudo apt-get install -f" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### RPM (Fedora/RHEL/openSUSE)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo rpm -i facetracker-*.rpm" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Pacman (Arch/Manjaro)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo pacman -U facetracker-*.pkg.tar.zst" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Required Dependencies (all formats)" >> release_notes.md
+          echo "- python3, python3-gi, python3-pil, python3-numpy" >> release_notes.md
+          echo "- GTK4, libadwaita" >> release_notes.md
+          echo "- v4l-utils (for webcam detection)" >> release_notes.md
+          echo "- OpenSeeFace facetracker binary (see [upstream](https://github.com/emilianavt/OpenSeeFace))" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "_Generated with AI assistance_" >> release_notes.md
+
+      - name: Release AppImage
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: facetracker-x86_64.AppImage
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  rpm:
+    name: "RPM Package (amd64)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Clone upstream source
+        run: |
+          git clone --depth 1 --branch 25.9 https://github.com/Z-Ray-Entertainment/Facetracker.git facetracker-src
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm meson ninja-build python3 python3-gi python3-pil python3-numpy pkg-config libglib2.0-dev libgtk-4-dev libadwaita-1-dev gobject-introspection appstream desktop-file-utils gettext
+
+      - name: Prepare RPM source
+        run: |
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          cp rpmbuild/SPECS/facetracker.spec ~/rpmbuild/SPECS/
+          cd facetracker-src
+          git archive --prefix=facetracker-25.9/ --format=tar.gz HEAD > ~/rpmbuild/SOURCES/facetracker-25.9.tar.gz
+
+      - name: Build RPM
+        run: |
+          rpmbuild -bb --nodeps ~/rpmbuild/SPECS/facetracker.spec
+
+      - name: Copy RPM to workspace
+        run: |
+          cp ~/rpmbuild/RPMS/x86_64/facetracker-*.rpm .
+
+      - name: Upload RPM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: facetracker-rpm
+          path: facetracker-*.rpm
+
+      - name: Generate release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "# Facetracker $TAG" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Face tracking made easy - graphical interface for OpenSeeFace." >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### AppImage (Universal)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "chmod +x facetracker-x86_64.AppImage" >> release_notes.md
+          echo "./facetracker-x86_64.AppImage" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Debian/Ubuntu" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo dpkg -i facetracker_*.deb" >> release_notes.md
+          echo "sudo apt-get install -f" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### RPM (Fedora/RHEL/openSUSE)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo rpm -i facetracker-*.rpm" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Pacman (Arch/Manjaro)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo pacman -U facetracker-*.pkg.tar.zst" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Required Dependencies (all formats)" >> release_notes.md
+          echo "- python3, python3-gi, python3-pil, python3-numpy" >> release_notes.md
+          echo "- GTK4, libadwaita" >> release_notes.md
+          echo "- v4l-utils (for webcam detection)" >> release_notes.md
+          echo "- OpenSeeFace facetracker binary (see [upstream](https://github.com/emilianavt/OpenSeeFace))" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "_Generated with AI assistance_" >> release_notes.md
+
+      - name: Release RPM
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: facetracker-*.rpm
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  pacman:
+    name: "Pacman Package (amd64)"
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Pacman package in Arch Linux container
+        run: |
+          docker run --rm -v "${{ github.workspace }}":/work archlinux/archlinux:latest bash -c "
+            pacman -Syu --noconfirm base-devel
+            cd /work
+            cat > PKGBUILD << 'PKGBUILD_EOF'
+            # Maintainer: Z-Ray Entertainment Packaging <packaging@z-ray.de>
+            pkgname=facetracker
+            pkgver=25.9
+            pkgrel=1
+            pkgdesc=\"Face tracking made easy - graphical interface for OpenSeeFace\"
+            arch=('x86_64')
+            url=\"https://codeberg.org/ZRayEntertainment/Facetracker\"
+            license=('MIT')
+            depends=('python' 'python-gobject' 'gtk4' 'libadwaita' 'python-pillow' 'python-numpy' 'v4l-utils')
+            makedepends=('meson' 'ninja')
+            source=(\"https://github.com/Z-Ray-Entertainment/Facetracker/archive/v\${pkgver}.tar.gz\")
+            sha256sums=('SKIP')
+
+            build() {
+              cd \"\${srcdir}/\${pkgname}-\${pkgver}\"
+              meson setup builddir --prefix=/usr
+              ninja -C builddir
+            }
+
+            package() {
+              cd \"\${srcdir}/\${pkgname}-\${pkgver}\"
+              DESTDIR=\"\${pkgdir}\" ninja -C builddir install
+            }
+            PKGBUILD_EOF
+            chown -R builduser:builduser .
+            su builduser -c 'makepkg -f --noconfirm --skippgpcheck'
+          "
+
+      - name: Upload Pacman artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: facetracker-pacman
+          path: facetracker-*.pkg.tar.zst
+
+      - name: Generate release notes
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "# Facetracker $TAG" > release_notes.md
+          echo "" >> release_notes.md
+          echo "Face tracking made easy - graphical interface for OpenSeeFace." >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Installation" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### AppImage (Universal)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "chmod +x facetracker-x86_64.AppImage" >> release_notes.md
+          echo "./facetracker-x86_64.AppImage" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Debian/Ubuntu" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo dpkg -i facetracker_*.deb" >> release_notes.md
+          echo "sudo apt-get install -f" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### RPM (Fedora/RHEL/openSUSE)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo rpm -i facetracker-*.rpm" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "### Pacman (Arch/Manjaro)" >> release_notes.md
+          echo '```bash' >> release_notes.md
+          echo "sudo pacman -U facetracker-*.pkg.tar.zst" >> release_notes.md
+          echo '```' >> release_notes.md
+          echo "" >> release_notes.md
+          echo "## Required Dependencies (all formats)" >> release_notes.md
+          echo "- python3, python3-gi, python3-pil, python3-numpy" >> release_notes.md
+          echo "- GTK4, libadwaita" >> release_notes.md
+          echo "- v4l-utils (for webcam detection)" >> release_notes.md
+          echo "- OpenSeeFace facetracker binary (see [upstream](https://github.com/emilianavt/OpenSeeFace))" >> release_notes.md
+          echo "" >> release_notes.md
+          echo "_Generated with AI assistance_" >> release_notes.md
+
+      - name: Release Pacman package
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: facetracker-*.pkg.tar.zst
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

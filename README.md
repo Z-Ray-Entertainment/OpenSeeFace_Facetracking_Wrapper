@@ -83,3 +83,29 @@ The following cams have been tested with this application in functioning and gat
 - Logitec HD WebCam C270
 - pulsonic HDR webcam
 - Integrated Camera of Lenovo V15 G4 AMN
+## Installation via Debian Package
+
+Debian packages (.deb) are built automatically via GitHub Actions. Download the latest `.deb` from the [Actions page](https://github.com/TheRealFame/Facetracker-Packaged/actions) and install:
+
+```bash
+sudo dpkg -i facetracker_*.deb
+sudo apt-get install -f
+```
+
+### Python Dependencies
+
+The deb package requires Python modules that are installed via pip:
+
+```bash
+pip install --break-system-packages f3d
+```
+
+### Building from Source
+
+```bash
+sudo apt-get install -y meson ninja-build valac libgtk-4-dev libadwaita-1-dev libgee-0.8-dev libopencv-dev python3 python3-pip
+pip install --break-system-packages f3d
+meson setup builddir --prefix=/usr
+ninja -C builddir
+sudo ninja -C builddir install
+```

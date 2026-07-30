@@ -1,0 +1,7 @@
+facetracker (25.9-1) unstable; urgency=medium
+
+  * New upstream release 25.9
+  * Add Debian package support
+  * Add GitHub Actions workflow for automated building
+
+ -- Z-Ray Entertainment Packaging <packaging@z-ray.de>  Wed, 03 Sep 2025 00:00:00 +0000
