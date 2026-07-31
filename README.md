@@ -83,3 +83,55 @@ The following cams have been tested with this application in functioning and gat
 - Logitec HD WebCam C270
 - pulsonic HDR webcam
 - Integrated Camera of Lenovo V15 G4 AMN
+# Packaging
+
+Community packaging for Debian, RPM, Pacman and AppImage is maintained in
+[TheRealFame/facetracker](https://github.com/TheRealFame/facetracker)
+(packaging branch) and built automatically via GitHub Actions.
+
+## Available formats
+
+| Format | File | Use case |
+|---|---|---|
+| AppImage | `facetracker-x86_64.AppImage` | Universal (any distro, no install) |
+| Debian | `facetracker_*_amd64.deb` | Debian, Ubuntu, Pop!_OS, Mint |
+| RPM | `facetracker-*.x86_64.rpm` | Fedora, RHEL, openSUSE |
+| Pacman | `facetracker-*.pkg.tar.zst` | Arch, Manjaro, EndeavourOS |
+
+## Installation
+
+### AppImage
+
+```bash
+chmod +x facetracker-x86_64.AppImage
+./facetracker-x86_64.AppImage
+```
+
+### Debian / Ubuntu
+
+```bash
+sudo dpkg -i facetracker_*_amd64.deb
+sudo apt-get install -f
+```
+
+### Fedora / RHEL / openSUSE
+
+```bash
+sudo rpm -i facetracker-*.x86_64.rpm
+```
+
+### Arch / Manjaro / EndeavourOS
+
+```bash
+sudo pacman -U facetracker-*.pkg.tar.zst
+```
+
+## Required dependencies
+
+- `python3`, `python3-gi`, `python3-pil`, `python3-numpy`
+- GTK4, libadwaita
+- `v4l-utils` (webcam detection)
+- OpenSeeFace `facetracker` binary (see [upstream](https://github.com/emilianavt/OpenSeeFace))
+
+See [PACKAGING_TROUBLESHOOTING.md](PACKAGING_TROUBLESHOOTING.md) for dependency
+and environment troubleshooting.
