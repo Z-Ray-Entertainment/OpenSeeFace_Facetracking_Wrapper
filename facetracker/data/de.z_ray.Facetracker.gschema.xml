@@ -13,17 +13,17 @@
         </key>
 
         <key name="tracking-video" type="s">
-            <default>"640x360@24"</default>
+            <default>'640x360@24'</default>
             <summary>Last used webcam video mode</summary>
         </key>
 
         <key name="server-ip" type="s">
-            <default>"0.0.0.0"</default>
+            <default>'0.0.0.0'</default>
             <summary>Last used server IP</summary>
         </key>
 
         <key name="server-port" type="s">
-            <default>"11573"</default>
+            <default>'11573'</default>
             <summary>Last used server IP</summary>
         </key>
     </schema>
