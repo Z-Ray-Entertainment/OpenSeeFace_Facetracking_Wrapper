@@ -157,7 +157,16 @@ class MainWindow(Gtk.ApplicationWindow):
             name = index + ": " + webcam.device_name
             cam_string_list.append(name)
         self.cam_combo_row.set_model(cam_string_list)
+
+        saved = self.settings.get_int("webcam-index")
+        if 0 <= saved < len(self.webcam_infos):
+            self.cam_combo_row.set_selected(saved)
+        
+        self.cam_combo_row.connect("notify::selected", self._on_cam_selected)
         self.cam_combo_row.connect("notify::selected-item", self._build_video_modes)
+
+    def _on_cam_selected(self, combo_row: Adw.ComboRow, _pspec) -> None:
+        self.settings.set_int("webcam-index", combo_row.get_selected())
 
     def _build_video_modes(self, widget, _a):
         self.video_modes_row.set_title(_("Video Mode:"))
