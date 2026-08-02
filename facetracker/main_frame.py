@@ -135,10 +135,12 @@ class MainWindow(Gtk.ApplicationWindow):
 
         self.ip_text = Adw.EntryRow()
         self.ip_text.set_title(_("IP Address:"))
-        self.ip_text.set_text("0.0.0.0")
         self.port_text = Adw.EntryRow()
         self.port_text.set_title(_("Port:"))
-        self.port_text.set_text("11573")
+
+        self.settings.bind("server-ip",   self.ip_text,   "text", Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind("server-port", self.port_text, "text", Gio.SettingsBindFlags.DEFAULT)
+
         ip_and_port_row.add_prefix(self.ip_text)
         ip_and_port_row.add_suffix(self.port_text)
         boxed_list.add_row(ip_and_port_row)
