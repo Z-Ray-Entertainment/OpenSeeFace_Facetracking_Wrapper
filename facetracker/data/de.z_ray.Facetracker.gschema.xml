@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema id="de.z_ray.Facetracker" path="/de/z_ray/facetracker/">
+
+        <key name="webcam-index" type="i">
+            <default>0</default>
+            <summary>Last used Webcam</summary>
+        </key>
+
+        <key name="tracking-model-index" type="i">
+            <default>4</default>
+            <summary>Last used tracking model</summary>
+        </key>
+
+        <key name="tracking-video" type="s">
+            <default>'640x360@24'</default>
+            <summary>Last used webcam video mode</summary>
+        </key>
+
+        <key name="server-ip" type="s">
+            <default>'0.0.0.0'</default>
+            <summary>Last used server IP</summary>
+        </key>
+
+        <key name="server-port" type="s">
+            <default>'11573'</default>
+            <summary>Last used server IP</summary>
+        </key>
+    </schema>
+</schemalist>
