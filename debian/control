@@ -1,0 +1,42 @@
+Source: facetracker
+Section: utils
+Priority: optional
+Maintainer: Z-Ray Entertainment Packaging <packaging@z-ray.de>
+Build-Depends: debhelper-compat (= 13),
+               meson (>= 0.62.0),
+               ninja-build,
+               python3,
+               python3-gi,
+               libgtk-4-dev,
+               libadwaita-1-dev,
+               gobject-introspection,
+               pkg-config,
+               libglib2.0-dev
+Standards-Version: 4.6.2
+Homepage: https://codeberg.org/ZRayEntertainment/Facetracker
+Vcs-Browser: https://github.com/Z-Ray-Entertainment/Facetracker
+Vcs-Git: https://github.com/Z-Ray-Entertainment/Facetracker.git
+Rules-Requires-Root: no
+
+Package: facetracker
+Architecture: any
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         python3,
+         python3-gi,
+         gir1.2-gtk-4.0,
+         gir1.2-adw-1,
+         python3-pil,
+         python3-numpy,
+         v4l-utils
+Description: Face tracking made easy
+ A graphical user interface to launch a face tracker locally on your machine
+ to gain tracking data from a webcam. These tracking data can then be used by
+ other applications like VTubbing Software to bring a virtual avatar to life.
+ .
+ Facetracker is a graphical user interface for OpenSeeFace, providing:
+  * Start / Stop the tracker
+  * Select Webcam
+  * Select video mode (width, height, frames per second)
+  * Select tracking model
+  * Set IP and Port for the tracker to listen
