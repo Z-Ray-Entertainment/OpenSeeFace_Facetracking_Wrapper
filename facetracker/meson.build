@@ -3,13 +3,16 @@ moduledir = join_paths(pkgdatadir, 'facetracker')
 
 subdir('data')
 
+gnome = import('gnome')
+gnome.post_install(glib_compile_schemas: true)
+
 conf = configuration_data()
 conf.set('VERSION', meson.project_version())
 
 python = import('python')
 conf = configuration_data()
 conf.set('PYTHON', python.find_installation('python3').full_path())
-conf.set('APPID', 'de.zray.Facetracker')
+conf.set('APPID', 'de.z_ray.Facetracker')
 conf.set('VERSION', meson.project_version())
 conf.set('localedir', join_paths(get_option('prefix'), get_option('localedir')))
 conf.set('pkgdatadir', pkgdatadir)

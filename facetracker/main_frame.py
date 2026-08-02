@@ -221,6 +221,7 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
         self.add_action(action)
 
     def on_activate(self, app):
+        self.settings = Gio.Settings(schema_id="de.z_ray.Facetracker")
         self.win = MainWindow(application=app)
         self.win.present()
 
