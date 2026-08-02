@@ -171,11 +171,40 @@ class MainWindow(Gtk.ApplicationWindow):
     def _build_video_modes(self, widget, _a):
         self.video_modes_row.set_title(_("Video Mode:"))
         self.video_modes_row.set_subtitle(_("Video mode to be used for face tracking"))
-        mode_string_list = Gtk.StringList()
+
         selected_cam = self._get_webcam_by_index(self._get_selected_camera_index())
-        for mode in selected_cam.get_osf_video_modes():
-            mode_string_list.append(mode.to_string())
+        modes = selected_cam.get_osf_video_modes()
+        saved_mode = self.settings.get_string("tracking-video")
+
+        mode_string_list = Gtk.StringList()
+        saved_index = None
+
+        for i, mode in enumerate(modes):
+            mode_str = mode.to_string()
+            mode_string_list.append(mode_str)
+            if mode_str == saved_mode:
+                saved_index = i
+
+        if hasattr(self, "_video_mode_handler_id"):
+            self.video_modes_row.disconnect(self._video_mode_handler_id)
+
         self.video_modes_row.set_model(mode_string_list)
+
+        if saved_index is not None:
+            self.video_modes_row.set_selected(saved_index)
+        else:
+            self.video_modes_row.set_selected(0)
+            first_mode = modes[0].to_string() if modes else ""
+            self.settings.set_string("tracking-video", first_mode)
+
+        self._video_mode_handler_id = self.video_modes_row.connect(
+            "notify::selected", self._on_video_mode_selected
+        )
+
+    def _on_video_mode_selected(self, combo_row: Adw.ComboRow, _pspec) -> None:
+        item = combo_row.get_selected_item()
+        if item is not None:
+            self.settings.set_string("tracking-video", item.get_string())
 
     def _rescan_for_cams(self, widget):
         self.webcam_infos = webcam_info.get_webcams()
