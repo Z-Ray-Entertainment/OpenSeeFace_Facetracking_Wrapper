@@ -7,8 +7,8 @@
             <summary>Last used Webcam</summary>
         </key>
 
-        <key name="tracking-model" type="i">
-            <default>3</default>
+        <key name="tracking-model-index" type="i">
+            <default>4</default>
             <summary>Last used tracking model</summary>
         </key>
 

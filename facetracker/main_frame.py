@@ -13,6 +13,8 @@ class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.settings = self.get_application().settings
+
         self.bt_launch: Gtk.ToggleButton
         self.cam_combo_row: Adw.ComboRow
         self.video_modes_row: Adw.ComboRow
@@ -120,7 +122,13 @@ class MainWindow(Gtk.ApplicationWindow):
         model_string_list.append("3: " + _("Default"))
         model_string_list.append("4: " + _("Wink optimized"))
         self.tracking_mode_row.set_model(model_string_list)
-        self.tracking_mode_row.set_selected(4)
+
+        self.settings.bind(
+            "tracking-model-index",
+            self.tracking_mode_row,
+            "selected",
+            Gio.SettingsBindFlags.DEFAULT
+        )
 
     def _build_server_settings(self, boxed_list: Adw.ExpanderRow):
         ip_and_port_row = Adw.ActionRow()
