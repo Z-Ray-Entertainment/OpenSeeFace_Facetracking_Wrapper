@@ -13,18 +13,90 @@
   ],
   "modules": [
     {
-      "name": "OpenSeeFace",
+      "name": "python3-onnxruntime-gpu",
       "buildsystem": "simple",
       "build-commands": [
-        "mkdir -p /app/share/facetracker/osf/",
-        "cp -r ./ /app/share/facetracker/osf/",
-        "chmod +x /app/share/facetracker/osf/facetracker"
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"onnxruntime-gpu==1.28.0\" --no-build-isolation"
       ],
       "sources": [
         {
-          "type": "archive",
-          "url": "https://codeberg.org/ZRayEntertainment/Facetracker/releases/download/25.2.1/osf_pre_build.zip",
-          "sha256": "2cfa657e4600891aef7e0c73751717e70f65ff86c303661e6b6ca894977f40bb"
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/f2/18/e4e906d564af3dd84c2816118ce8e0c087d351ef69a819727b940fb01b6b/onnxruntime_gpu-1.28.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "3b3a63cecd239d72432cd44569d047de8f4d69e471cd5f60f7ac7fc8769be5ec"
+        },
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/b8/a9/6e73d68500f80773f65f0654ea932019d6694329a0eb0ed0533de38df376/numpy-2.5.1-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "59fda5e192b570217ec2580c96f00e9a7e12ef6866a900eb089b62c1a32545ca"
+        },
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/19/c7/5f7c636ec43e0c545e28d1f1db71990108306f7bdcb89f069ba97e428e7f/protobuf-7.35.1-py3-none-any.whl",
+          "sha256": "4bc97768d8fe4ad6743c8a19403e314511ed9f6d13205b687e52421c023ac1b9"
+        },
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/22/fd/89965aa4ac08c74998539fcbf24fa3540f3e15237fbeb6bcf9c908f4aade/flatbuffers-25.12.19-py2.py3-none-any.whl",
+          "sha256": "7634f50c427838bb021c2d66a3d1168e9d199b0607e6329399f04846d42e20b4"
+        },
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl",
+          "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+        }
+      ]
+    },
+    {
+      "name": "python3-pillow",
+      "buildsystem": "simple",
+      "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"pillow==12.3.0\" --no-build-isolation"
+      ],
+      "sources": [
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/84/21/a35af28dcc61f37ed850a2d64c65c701321dfbf25085e469d5559360cbbf/pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+          "sha256": "78cb2c6865a35ab8ff8b75fd122f6033b92a62c82801110e48ddd6c936a45d91"
+        }
+      ]
+    },
+    {
+      "name": "python3-opencv",
+      "buildsystem": "simple",
+      "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} opencv-python-headless --no-build-isolation"
+      ],
+      "sources": [
+        {
+          "type": "file",
+          "url": "https://files.pythonhosted.org/packages/2b/97/8170e9819764c47e436c130d3ff6cfb73b58f923eae9d3a03d8982b04aec/opencv_python_headless-5.0.0.93-cp37-abi3-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+          "sha256": "09a872a157c1376ab922a69bbf22f9a95bcc7b658a9d8b436a60212b02b2eeb4"
+        }
+      ]
+    },
+    {
+      "name": "openseeface",
+      "buildsystem": "simple",
+      "build-commands": [
+        "install -Dm755 facetracker.py ${FLATPAK_DEST}/lib/openseeface/facetracker.py",
+        "cp -r models ${FLATPAK_DEST}/lib/openseeface/models",
+        "cp -r *.py ${FLATPAK_DEST}/lib/openseeface/",
+        "install -Dm755 openseeface-launch.sh ${FLATPAK_DEST}/bin/openseeface"
+      ],
+      "sources": [
+        {
+          "type": "git",
+          "url": "https://github.com/emilianavt/OpenSeeFace.git",
+          "tag": "v1.20.4",
+          "commit": "8a7a7961d0c87a69011ab08597b674f6476ca7f8"
+        },
+        {
+          "type": "script",
+          "dest-filename": "openseeface-launch.sh",
+          "commands": [
+            "#!/bin/sh",
+            "exec python3 /app/lib/openseeface/facetracker.py \"$@\""
+          ]
         }
       ]
     },
