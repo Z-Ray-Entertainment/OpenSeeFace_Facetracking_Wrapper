@@ -87,8 +87,7 @@
         {
           "type": "git",
           "url": "https://github.com/emilianavt/OpenSeeFace.git",
-          "tag": "v1.20.4",
-          "commit": "8a7a7961d0c87a69011ab08597b674f6476ca7f8"
+          "commit": "85aa70fc67582d046e771ea73625182a0d8f7475"
         },
         {
           "type": "script",
