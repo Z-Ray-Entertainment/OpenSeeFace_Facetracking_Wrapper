@@ -13,6 +13,8 @@ class MainWindow(Gtk.ApplicationWindow):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.settings = self.get_application().settings
+
         self.bt_launch: Gtk.ToggleButton
         self.cam_combo_row: Adw.ComboRow
         self.video_modes_row: Adw.ComboRow
@@ -120,17 +122,25 @@ class MainWindow(Gtk.ApplicationWindow):
         model_string_list.append("3: " + _("Default"))
         model_string_list.append("4: " + _("Wink optimized"))
         self.tracking_mode_row.set_model(model_string_list)
-        self.tracking_mode_row.set_selected(4)
+
+        self.settings.bind(
+            "tracking-model-index",
+            self.tracking_mode_row,
+            "selected",
+            Gio.SettingsBindFlags.DEFAULT
+        )
 
     def _build_server_settings(self, boxed_list: Adw.ExpanderRow):
         ip_and_port_row = Adw.ActionRow()
 
         self.ip_text = Adw.EntryRow()
         self.ip_text.set_title(_("IP Address:"))
-        self.ip_text.set_text("0.0.0.0")
         self.port_text = Adw.EntryRow()
         self.port_text.set_title(_("Port:"))
-        self.port_text.set_text("11573")
+
+        self.settings.bind("server-ip",   self.ip_text,   "text", Gio.SettingsBindFlags.DEFAULT)
+        self.settings.bind("server-port", self.port_text, "text", Gio.SettingsBindFlags.DEFAULT)
+
         ip_and_port_row.add_prefix(self.ip_text)
         ip_and_port_row.add_suffix(self.port_text)
         boxed_list.add_row(ip_and_port_row)
@@ -147,16 +157,54 @@ class MainWindow(Gtk.ApplicationWindow):
             name = index + ": " + webcam.device_name
             cam_string_list.append(name)
         self.cam_combo_row.set_model(cam_string_list)
+
+        saved = self.settings.get_int("webcam-index")
+        if 0 <= saved < len(self.webcam_infos):
+            self.cam_combo_row.set_selected(saved)
+        
+        self.cam_combo_row.connect("notify::selected", self._on_cam_selected)
         self.cam_combo_row.connect("notify::selected-item", self._build_video_modes)
+
+    def _on_cam_selected(self, combo_row: Adw.ComboRow, _pspec) -> None:
+        self.settings.set_int("webcam-index", combo_row.get_selected())
 
     def _build_video_modes(self, widget, _a):
         self.video_modes_row.set_title(_("Video Mode:"))
         self.video_modes_row.set_subtitle(_("Video mode to be used for face tracking"))
-        mode_string_list = Gtk.StringList()
+
         selected_cam = self._get_webcam_by_index(self._get_selected_camera_index())
-        for mode in selected_cam.get_osf_video_modes():
-            mode_string_list.append(mode.to_string())
+        modes = selected_cam.get_osf_video_modes()
+        saved_mode = self.settings.get_string("tracking-video")
+
+        mode_string_list = Gtk.StringList()
+        saved_index = None
+
+        for i, mode in enumerate(modes):
+            mode_str = mode.to_string()
+            mode_string_list.append(mode_str)
+            if mode_str == saved_mode:
+                saved_index = i
+
+        if hasattr(self, "_video_mode_handler_id"):
+            self.video_modes_row.disconnect(self._video_mode_handler_id)
+
         self.video_modes_row.set_model(mode_string_list)
+
+        if saved_index is not None:
+            self.video_modes_row.set_selected(saved_index)
+        else:
+            self.video_modes_row.set_selected(0)
+            first_mode = modes[0].to_string() if modes else ""
+            self.settings.set_string("tracking-video", first_mode)
+
+        self._video_mode_handler_id = self.video_modes_row.connect(
+            "notify::selected", self._on_video_mode_selected
+        )
+
+    def _on_video_mode_selected(self, combo_row: Adw.ComboRow, _pspec) -> None:
+        item = combo_row.get_selected_item()
+        if item is not None:
+            self.settings.set_string("tracking-video", item.get_string())
 
     def _rescan_for_cams(self, widget):
         self.webcam_infos = webcam_info.get_webcams()
@@ -221,6 +269,7 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
         self.add_action(action)
 
     def on_activate(self, app):
+        self.settings = Gio.Settings(schema_id="de.z_ray.Facetracker")
         self.win = MainWindow(application=app)
         self.win.present()
 

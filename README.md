@@ -35,10 +35,14 @@ Simple wrapper UI for OpenSeeFace's facetracker.
 ## Development Requirements
 
 - gcc
+- cmake
+- cairo-devel
 - python3-devel
 - python3-pip
 - gobject-introspection-devel
 - v4l-utils
+- typelib-1_0-Gtk-4_0
+- typelib-1_0-Adw-1
 
 ### Setup
 

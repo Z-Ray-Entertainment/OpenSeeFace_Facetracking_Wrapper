@@ -55,6 +55,22 @@
     <url type="help">https://codeberg.org/ZRayEntertainment/Facetracker/issues</url>
 
     <releases>
+        <release version="26.8" date="2026-08-02">
+            <description>
+                <ul>
+                    <li>Save and load settings</li>
+                    <li>Updated to Gnome Platform 50 (this was already in the flathub build but not in the OG source, now it is)</li>
+                </ul>
+            </description>
+        </release>
+        <release version="25.9" date="2025-09-03">
+            <description>
+                <ul>
+                    <li>Fixed some warning</li>
+                    <li>"temporal" workaround to exclude loopback device from device filtering</li>
+                </ul>
+            </description>
+        </release>
         <release version="25.3" date="2025-03-24">
             <description>
                 <ul>

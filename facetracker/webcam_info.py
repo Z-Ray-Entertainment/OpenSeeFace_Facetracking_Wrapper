@@ -88,7 +88,11 @@ def get_webcams() -> [WebcamInfo]:
                                                 stdout=subprocess.PIPE)
             device_name = device_name_result.stdout.decode("utf-8").rstrip()
             device_path_result = subprocess.run(["realpath", video_devices_path + video_dir], stdout=subprocess.PIPE)
-            device_path = device_path_result.stdout.decode("utf-8").rstrip().split("video4linux")[0]
+            device_real_path = device_path_result.stdout.decode("utf-8").rstrip()
+            if device_real_path.startswith("/sys/devices/virtual/video4linux/"): # Skip loopback devices from filterng
+                device_path = device_real_path
+            else:
+                device_path = device_real_path.split("video4linux")[0]
 
             webcaminfo = WebcamInfo(device_index, device_name, device_path)
 
