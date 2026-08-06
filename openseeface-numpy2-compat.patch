@@ -1,0 +1,36 @@
+diff -Pdpru OpenSeeFace-master/facetracker.py OpenSeeFace-patched/facetracker.py
+--- OpenSeeFace-master/facetracker.py	2025-12-28 03:52:30.000000000 +0100
++++ OpenSeeFace-patched/facetracker.py	2026-08-06 13:43:56.966834241 +0200
+@@ -292,9 +292,10 @@ try:
+                 packet.extend(bytearray(struct.pack("f", f.euler[0])))
+                 packet.extend(bytearray(struct.pack("f", f.euler[1])))
+                 packet.extend(bytearray(struct.pack("f", f.euler[2])))
+-                packet.extend(bytearray(struct.pack("f", f.translation[0])))
+-                packet.extend(bytearray(struct.pack("f", f.translation[1])))
+-                packet.extend(bytearray(struct.pack("f", f.translation[2])))
++                _t = f.translation.reshape(-1)
++                packet.extend(bytearray(struct.pack("f", _t[0])))
++                packet.extend(bytearray(struct.pack("f", _t[1])))
++                packet.extend(bytearray(struct.pack("f", _t[2])))
+                 if log is not None:
+                     log.write(f"{frame_count},{now},{width},{height},{fps},{face_num},{f.id},{f.eye_blink[0]},{f.eye_blink[1]},{f.conf},{f.success},{f.pnp_error},{f.quaternion[0]},{f.quaternion[1]},{f.quaternion[2]},{f.quaternion[3]},{f.euler[0]},{f.euler[1]},{f.euler[2]},{f.rotation[0]},{f.rotation[1]},{f.rotation[2]},{f.translation[0]},{f.translation[1]},{f.translation[2]}")
+                 for (x,y,c) in f.lms:
+diff -Pdpru OpenSeeFace-master/tracker.py OpenSeeFace-patched/tracker.py
+--- OpenSeeFace-master/tracker.py	2025-12-28 03:52:30.000000000 +0100
++++ OpenSeeFace-patched/tracker.py	2026-08-06 14:22:04.207984840 +0200
+@@ -832,12 +832,12 @@ class Tracker():
+             if i < 2:
+                 reference = rmat.dot(pt)
+                 reference = reference + face_info.translation
+-                reference = self.camera.dot(reference)
++                reference = self.camera.dot(reference.reshape(-1))
+                 depth = reference[2]
+                 pt_3d = np.array([lms[66+i][0] * depth, lms[66+i][1] * depth, depth], np.float32)
+-                pt_3d = self.inverse_camera.dot(pt_3d)
++                pt_3d = self.inverse_camera.dot(pt_3d.reshape(-1))
+                 pt_3d = pt_3d - face_info.translation
+-                pt_3d = inverse_rotation.dot(pt_3d)
++                pt_3d = inverse_rotation.dot(pt_3d.reshape(-1))
+                 pts_3d[66+i,:] = pt_3d[:]
+         pts_3d[np.isnan(pts_3d).any(axis=1)] = np.array([0.,0.,0.], dtype=np.float32)
+ 

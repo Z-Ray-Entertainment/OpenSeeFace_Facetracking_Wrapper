@@ -2,6 +2,7 @@
 *.egg-info/
 build/
 __pycache__
+patch/
 dist/
 flatpak_build/.flatpak-builder/
 flatpak_build/builddir/

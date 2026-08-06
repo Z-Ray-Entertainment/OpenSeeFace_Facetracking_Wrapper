@@ -15,7 +15,7 @@ def run_facetracker(width: int, height: int, fps: int, device_index: int, tracki
         try:
             is_tracking = True
             if os.environ.get("FLATPAK_ID") is not None:
-                script_to_run = "/app/share/facetracker/osf/facetracker"
+                script_to_run = "/app/bin/openseeface"
             else:
                 script_to_run = "facetracker/osf/facetracker"
             face_process = subprocess.Popen(
