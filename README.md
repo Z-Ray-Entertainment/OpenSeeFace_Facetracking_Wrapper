@@ -51,29 +51,6 @@ Simple wrapper UI for OpenSeeFace's facetracker.
 - Open Source Directory of Facetracker
 - Run
 
-#### Python / PyCharm
-- Clone Repository
-- Install
-  - typelib-1_0-Gtk-4_0
-  - typelib-1_0-Adw-1
-- Provide osf pre-build binary (see below)
-- `python3 facetracker/__init__.py`
-
-### OpenSeeFace prebuild binary
-
-To ease up flatpak distribution Facetracker uses OpenSeeFace's facetracker as a pre-build binary.  
-Get is as follows:
-
-- `git clone git@github.com:emilianavt/OpenSeeFace.git`
-- `cd OpenSeeFace`
-- `pip install onnxruntime opencv-python pillow numpy`
-- `pip install -U pyinstaller`
-- `pyinstaller ./facetracker.py`
-- `cp models ./dist/facetracker/`
-
-To test the pre-build locally create a symbolic link inside the source directory of Facetracker/facetracker/osf pointing
-towards the dist directory of the pre-build.
-
 # Webcams tested
 The following cams have been tested with this application in functioning and gathering device capabilities properly
 
