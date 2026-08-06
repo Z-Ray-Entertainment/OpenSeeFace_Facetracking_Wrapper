@@ -1,6 +1,6 @@
 diff -Pdpru OpenSeeFace-master/facetracker.py OpenSeeFace-patched/facetracker.py
---- OpenSeeFace-master/facetracker.py	2025-12-28 12:52:30.000000000 +0100
-+++ OpenSeeFace-patched/facetracker.py	2026-08-06 12:50:30.334812110 +0200
+--- OpenSeeFace-master/facetracker.py	2025-12-28 03:52:30.000000000 +0100
++++ OpenSeeFace-patched/facetracker.py	2026-08-06 13:43:56.966834241 +0200
 @@ -292,9 +292,10 @@ try:
                  packet.extend(bytearray(struct.pack("f", f.euler[0])))
                  packet.extend(bytearray(struct.pack("f", f.euler[1])))
@@ -16,9 +16,17 @@ diff -Pdpru OpenSeeFace-master/facetracker.py OpenSeeFace-patched/facetracker.py
                      log.write(f"{frame_count},{now},{width},{height},{fps},{face_num},{f.id},{f.eye_blink[0]},{f.eye_blink[1]},{f.conf},{f.success},{f.pnp_error},{f.quaternion[0]},{f.quaternion[1]},{f.quaternion[2]},{f.quaternion[3]},{f.euler[0]},{f.euler[1]},{f.euler[2]},{f.rotation[0]},{f.rotation[1]},{f.rotation[2]},{f.translation[0]},{f.translation[1]},{f.translation[2]}")
                  for (x,y,c) in f.lms:
 diff -Pdpru OpenSeeFace-master/tracker.py OpenSeeFace-patched/tracker.py
---- OpenSeeFace-master/tracker.py	2025-12-28 12:52:30.000000000 +0100
-+++ OpenSeeFace-patched/tracker.py	2026-08-05 18:16:56.522747464 +0200
-@@ -832,12 +832,12 @@ class Tracker():
+--- OpenSeeFace-master/tracker.py	2025-12-28 03:52:30.000000000 +0100
++++ OpenSeeFace-patched/tracker.py	2026-08-06 13:45:27.173356062 +0200
+@@ -530,6 +530,7 @@ class Tracker():
+         # OTR 1.9 and later requires specifying providers
+         # explicitly as an argument in InferenceSession()
+         providersList = onnxruntime.capi._pybind_state.get_available_providers()
++        print(providersList)
+ 
+         # Single face instance with multiple threads
+         self.session = onnxruntime.InferenceSession(os.path.join(model_base_path, model), sess_options=options, providers=providersList)
+@@ -832,12 +833,12 @@ class Tracker():
              if i < 2:
                  reference = rmat.dot(pt)
                  reference = reference + face_info.translation
