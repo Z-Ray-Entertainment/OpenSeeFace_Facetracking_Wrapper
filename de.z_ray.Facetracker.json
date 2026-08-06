@@ -21,18 +21,39 @@
       "sources": [
         {
           "type": "file",
+          "only-arches": ["x86_64"],
           "url": "https://files.pythonhosted.org/packages/78/b6/8c5396e7894e77c5a7d1e026f3acb9dd39c4b5644e412e37a0055eaa3bc5/onnxruntime-1.28.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
           "sha256": "54fa221d669282bd8f582708ce4c96010a7e9fb0661f9006b37fe2fedafb73fe"
         },
         {
           "type": "file",
+          "only-arches": ["aarch64"],
+          "url": "https://files.pythonhosted.org/packages/c0/23/b46045c3bf67a9cf54c12f5df0f018a422c65fbb9d6072b10071bebfaae2/onnxruntime-1.28.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl",
+          "sha256": "f649dd6f6452d12a8059888aa489fe519e062e18793dac72b9efa0f9fdb64135"
+        },
+        {
+          "type": "file",
+          "only-arches": ["x86_64"],
           "url": "https://files.pythonhosted.org/packages/ed/a7/2bcd3fdbb87804755c35b729bf8709d62025c5f4cfd7d5b2415997097515/numpy-2.5.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
           "sha256": "9726558e8db4a5bf7929a70ae50f63abda4daf0efe810e3bfbab95976f75fc1a"
         },
         {
           "type": "file",
+          "only-arches": ["aarch64"],
+          "url": "https://files.pythonhosted.org/packages/2e/20/1ee6614d64332a1bba6411f38e68cb79eec1b2459e20a623777c5c5492a2/numpy-2.5.1-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl",
+          "sha256": "1c6759f538fb912fc46de0a6b1758ccf7b57bc7c7ebebc23974fdac3de8db0cd"
+        },
+        {
+          "type": "file",
+          "only-arches": ["x86_64"],
           "url": "https://files.pythonhosted.org/packages/e4/be/5b3cfe508bfab6761414ff944e3366eb13be4fd71efcd69450f89ba39f43/protobuf-7.35.1-cp310-abi3-manylinux2014_x86_64.whl",
           "sha256": "74758715c53d7158fb76caf4f0cfdacc5329a4b1bb994f865d6cf302d413a1c4"
+        },
+        {
+          "type": "file",
+          "only-arches": ["aarch64"],
+          "url": "https://files.pythonhosted.org/packages/37/4b/dfb89eb0e652a1ff073c39a59fb5e3a83cfe9b57a2c83fa6d78270101767/protobuf-7.35.1-cp310-abi3-manylinux2014_aarch64.whl",
+          "sha256": "11d6b0ec246892d85215b0a13ca6e0233cf5284b68f0ac02646427f4ff88a799"
         },
         {
           "type": "file",
@@ -55,8 +76,15 @@
       "sources": [
         {
           "type": "file",
+          "only-arches": ["x86_64"],
           "url": "https://files.pythonhosted.org/packages/f7/62/de5bdd77d935331f4f802edc11e4d82950f642caad6cb2f949837b8560e2/pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
           "sha256": "0847a763afefb695bc912d7c131e7e0632d4edc1d8698f58ddabec8e46b8b6d3"
+        },
+        {
+          "type": "file",
+          "only-arches": ["aarch64"],
+          "url": "https://files.pythonhosted.org/packages/1f/01/e18aff37cb0b4aac47ac90f016d347a49aca667ef97f190b06ac2aabc928/pillow-12.3.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl",
+          "sha256": "f7401aebd7f581d7f83a439d87d474999317ee099218e5ad25d125290990ba65"
         }
       ]
     },
@@ -69,8 +97,15 @@
       "sources": [
         {
           "type": "file",
+          "only-arches": ["x86_64"],
           "url": "https://files.pythonhosted.org/packages/9b/21/f6ef335f6e65724aa78b8d792b48d40a48c381715f1e62f5a5049e09d07e/opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_x86_64.whl",
           "sha256": "ed709fdf9aa0bd1f2ed8549e71d19449b03a675bb581eb292285f6861953be37"
+        },
+        {
+          "type": "file",
+          "only-arches": ["aarch64"],
+          "url": "https://files.pythonhosted.org/packages/3a/98/1a28a7101e31801042b3098871a74b76c61581d328ef40774ff4edb53a56/opencv_python_headless-5.0.0.93-cp37-abi3-manylinux_2_28_aarch64.whl",
+          "sha256": "840bd717c21e5c11cadadc022a823315ea417f961213d06b4df010e019eb16f4"
         }
       ]
     },
