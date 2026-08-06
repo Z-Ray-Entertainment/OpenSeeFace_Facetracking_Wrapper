@@ -90,6 +90,10 @@
           "commit": "85aa70fc67582d046e771ea73625182a0d8f7475"
         },
         {
+          "type": "patch",
+          "path": "openseeface-numpy2-compat.patch"
+        },
+        {
           "type": "script",
           "dest-filename": "openseeface-launch.sh",
           "commands": [
