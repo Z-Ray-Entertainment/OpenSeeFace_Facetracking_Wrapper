@@ -224,7 +224,7 @@ class OpenSeeFaceFacetrackingWrapper(Adw.Application):
         self.win = MainWindow(application=app)
         self.win.present()
 
-    def on_close(self):
+    def on_close(self, app):
         if face_wrapper.tracking_in_progress():
             face_wrapper.stop_facetracker()
 
