@@ -55,6 +55,14 @@
     <url type="help">https://codeberg.org/ZRayEntertainment/Facetracker/issues</url>
 
     <releases>
+        <release version="26.8.1" date="2026-08-07">
+            <description>
+                <ul>
+                    <li>aarch64 support</li>
+                    <li>removed dependence on pre-build OpenSeeFace binary</li>
+                </ul>
+            </description>
+        </release>
         <release version="26.8" date="2026-08-02">
             <description>
                 <ul>
