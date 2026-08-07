@@ -21,7 +21,7 @@ def run_facetracker(width: int, height: int, fps: int, device_index: int, tracki
             face_process = subprocess.Popen(
                 [script_to_run, "-W", str(width), "-H", str(height), "-c", str(device_index),
                  "--discard-after", "0", "--scan-every", "0", "--no-3d-adapt", "1", "--max-feature-updates", "900",
-                 "-s", "1", "-p", str(server_port), "-i", server_ip, "--model", tracking_mode])
+                 "-s", "1", "-p", str(server_port), "-i", str(server_ip), "--model", tracking_mode])
             return True
         except Exception as e:
             pass
