@@ -60,6 +60,7 @@
                 <ul>
                     <li>aarch64 support</li>
                     <li>removed dependence on pre-build OpenSeeFace binary</li>
+                    <li>Update OpenSeeFace to commit 85aa70f</li>
                 </ul>
             </description>
         </release>
