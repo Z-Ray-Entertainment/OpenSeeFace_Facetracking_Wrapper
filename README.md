@@ -22,6 +22,8 @@ Simple wrapper UI for OpenSeeFace's facetracker.
 
 </div>
 
+**Supported Architectures:** x86_64, aarch64
+
 ### Download
 
 <div style="text-align: center;">
@@ -60,3 +62,6 @@ The following cams have been tested with this application in functioning and gat
 - Logitec HD WebCam C270
 - pulsonic HDR webcam
 - Integrated Camera of Lenovo V15 G4 AMN
+
+# aarch64 tested
+Testen on a Raspberry Pi 400 using a 640x360@30 fps. Tracking speed around 7 fps. Not great but works. You for sure need a more beefy aarch64 device than this to run Facetracker successfully.
