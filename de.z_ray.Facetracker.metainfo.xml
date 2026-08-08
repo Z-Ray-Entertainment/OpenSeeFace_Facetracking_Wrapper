@@ -50,9 +50,24 @@
         </screenshot>
     </screenshots>
 
-    <url type="homepage">https://codeberg.org/ZRayEntertainment/Facetracker</url>
+    <url type="homepage">https://z-ray.de/en/portfolio/facetracker/</url>
+    <url type="help">https://docs.z-ray.de/en/facetracker/</url>
+    <url type="faq">https://docs.z-ray.de/en/facetracker/faq/</url>
+    <url type="bugtracker">https://codeberg.org/ZRayEntertainment/Facetracker/issues</url>
     <url type="vcs-browser">https://codeberg.org/ZRayEntertainment/Facetracker</url>
-    <url type="help">https://codeberg.org/ZRayEntertainment/Facetracker/issues</url>
+    <url type="translate">https://codeberg.org/ZRayEntertainment/Facetracker/src/branch/main/facetracker/data/po</url>
+
+    <requires>
+        <display_length compare="ge">360</display_length>
+        <internet>offline-only</internet>
+    </requires>
+
+    <supports>
+        <control>keyboard</control>
+        <control>pointing</control>
+        <control>touch</control>
+    </supports>
+
 
     <releases>
         <release version="26.8.1" date="2026-08-07">
