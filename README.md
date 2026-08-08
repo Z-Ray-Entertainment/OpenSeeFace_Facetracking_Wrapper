@@ -12,7 +12,7 @@ Simple wrapper UI for OpenSeeFace's facetracker.
 - Select Webcam
 - Select video mode (width, height, frames per second)
 - Select tracking model used by the facetracker
-- Set IP and Port for the tracker to listen
+- Set IP and Port for the tracker to send data to
 
 <div style="text-align: center;">
 
