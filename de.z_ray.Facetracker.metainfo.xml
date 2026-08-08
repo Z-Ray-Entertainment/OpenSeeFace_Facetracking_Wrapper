@@ -59,7 +59,6 @@
 
     <requires>
         <display_length compare="ge">360</display_length>
-        <internet>offline-only</internet>
     </requires>
 
     <supports>
